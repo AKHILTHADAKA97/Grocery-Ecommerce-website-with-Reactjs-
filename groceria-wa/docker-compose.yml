@@ -1,0 +1,11 @@
+services:
+  web:
+    image: akhilthadaa/groceria-wa:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_WHATSAPP_NUMBER: ${VITE_WHATSAPP_NUMBER:-}
+    ports:
+      - "${PORT:-8080}:80"
+    restart: unless-stopped

@@ -1,0 +1,63 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --color-cream: #fff8f3;
+  --color-peach: #ffe8dc;
+  --color-peach-deep: #ffd4c4;
+  --color-orange: #f97316;
+  --color-orange-dark: #ea580c;
+  --color-wa: #25d366;
+  --color-wa-dark: #128c7e;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-[#fff8f3] text-stone-600 antialiased font-sans;
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+  a,
+  button,
+  [role='button'] {
+    cursor: pointer;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    @apply text-stone-900 font-semibold tracking-tight;
+  }
+}
+
+@layer utilities {
+  .glass-nav {
+    @apply bg-white/85 backdrop-blur-md border-b border-orange-100/60;
+  }
+  .shadow-soft {
+    box-shadow: 0 12px 40px -12px rgba(249, 115, 22, 0.15),
+      0 4px 16px -4px rgba(0, 0, 0, 0.06);
+  }
+  .shadow-card {
+    box-shadow: 0 8px 28px -8px rgba(0, 0, 0, 0.08),
+      0 2px 8px -2px rgba(0, 0, 0, 0.04);
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Swiper (hero) */
+.hero-swiper .swiper-pagination-bullet {
+  @apply bg-orange-200 opacity-100;
+}
+.hero-swiper .swiper-pagination-bullet-active {
+  @apply w-6 rounded-full bg-orange-600;
+}
