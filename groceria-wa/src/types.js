@@ -14,6 +14,7 @@
 /**
  * @typedef {Object} CustomerInfo
  * @property {string} name
+ * @property {string} email
  * @property {string} phone
  * @property {string} address
  * @property {string} landmark

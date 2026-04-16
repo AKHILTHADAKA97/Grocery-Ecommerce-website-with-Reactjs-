@@ -7,7 +7,8 @@ import {
 } from 'react'
 
 const CART_KEY = 'groceria_cart'
-export const COD_CHARGE_INR = 30
+export const COD_CHARGE_MIN_INR = 30
+export const COD_CHARGE_MAX_INR = 50
 
 /** @typedef {{ cat: string, productId: string, name: string, price: number, img?: string, qty: number }} CartLine */
 
@@ -22,6 +23,13 @@ function loadCart() {
   } catch {
     return []
   }
+}
+
+/** @param {number} itemCount */
+function getCodCharge(itemCount) {
+  if (itemCount <= 0) return 0
+  const span = COD_CHARGE_MAX_INR - COD_CHARGE_MIN_INR + 1
+  return COD_CHARGE_MIN_INR + ((itemCount * 7) % span)
 }
 
 export function CartProvider({ children }) {
@@ -93,16 +101,16 @@ export function CartProvider({ children }) {
     () => lines.reduce((s, l) => s + l.price * l.qty, 0),
     [lines],
   )
-  const codCharge = useMemo(
-    () => (codSelected && lines.length > 0 ? COD_CHARGE_INR : 0),
-    [codSelected, lines.length],
-  )
-  const tax = useMemo(() => Math.round(subtotal * 0.05 * 100) / 100, [subtotal])
-  const total = useMemo(() => subtotal + tax + codCharge, [subtotal, tax, codCharge])
   const count = useMemo(
     () => lines.reduce((s, l) => s + l.qty, 0),
     [lines],
   )
+  const codCharge = useMemo(
+    () => (codSelected ? getCodCharge(count) : 0),
+    [codSelected, count],
+  )
+  const tax = useMemo(() => Math.round(subtotal * 0.05 * 100) / 100, [subtotal])
+  const total = useMemo(() => subtotal + tax + codCharge, [subtotal, tax, codCharge])
 
   const value = useMemo(
     () => ({

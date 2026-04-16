@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'groceria_orders_by_day'
+const ORDER_SEQ_KEY = 'groceria_order_seq'
 
 /** @returns {Record<string, import('../types').Order[]>} */
 export function loadOrdersMap() {
@@ -71,4 +72,16 @@ export function updateOrderStatusInMap(map, dayKey, orderId, status) {
 /** @param {Record<string, import('../types').Order[]>} map */
 export function daysWithOrders(map) {
   return Object.keys(map).filter((k) => Array.isArray(map[k]) && map[k].length > 0)
+}
+
+/** @returns {string} */
+export function nextOrderId() {
+  try {
+    const curr = Number(localStorage.getItem(ORDER_SEQ_KEY) || '0') || 0
+    const next = curr + 1
+    localStorage.setItem(ORDER_SEQ_KEY, String(next))
+    return `groceria._${next}`
+  } catch {
+    return `groceria._${Date.now()}`
+  }
 }

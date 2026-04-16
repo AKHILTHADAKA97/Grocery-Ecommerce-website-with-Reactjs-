@@ -15,6 +15,24 @@ import { useNavigate } from 'react-router-dom'
 import { UPCOMING_ITEMS, findProduct } from '../data/products'
 import { formatMoney } from '../lib/format'
 import WishlistDrawer from '../components/WishlistDrawer'
+import { addNotifyRequest } from '../utils/notifyStorage'
+
+const EMAIL_COOKIE = 'groceria_user_email'
+
+function getCookie(name) {
+  const token = `${name}=`
+  const parts = document.cookie.split(';')
+  for (const raw of parts) {
+    const item = raw.trim()
+    if (item.startsWith(token)) return decodeURIComponent(item.slice(token.length))
+  }
+  return ''
+}
+
+function setCookie(name, value, days = 90) {
+  const expires = new Date(Date.now() + days * 86400000).toUTCString()
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`
+}
 
 function DealTimer() {
   const [left, setLeft] = useState(() => 11 * 3600 + 44 * 60 + 30)
@@ -98,6 +116,9 @@ export default function Home() {
   const [wishOpen, setWishOpen] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [toast, setToast] = useState('')
+  const [notifyOpen, setNotifyOpen] = useState(false)
+  const [notifyEmail, setNotifyEmail] = useState('')
+  const [notifyProduct, setNotifyProduct] = useState(null)
 
   function showToast(msg) {
     setToast(msg)
@@ -114,6 +135,37 @@ export default function Home() {
     const term = q.trim()
     if (term.length < 2) return
     navigate(`/search?q=${encodeURIComponent(term)}`)
+  }
+
+  function handleNotifyClick(item) {
+    const cookieEmail = getCookie(EMAIL_COOKIE)
+    if (cookieEmail) {
+      addNotifyRequest({
+        productId: item.id,
+        productName: item.name,
+        email: cookieEmail,
+      })
+      showToast(`Notify added for ${item.name}. We will msg shortly if stock update.`)
+      return
+    }
+    setNotifyProduct(item)
+    setNotifyEmail('')
+    setNotifyOpen(true)
+  }
+
+  function submitNotifyRequest() {
+    const email = notifyEmail.trim().toLowerCase()
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !notifyProduct) return
+    setCookie(EMAIL_COOKIE, email)
+    addNotifyRequest({
+      productId: notifyProduct.id,
+      productName: notifyProduct.name,
+      email,
+    })
+    setNotifyOpen(false)
+    setNotifyProduct(null)
+    setNotifyEmail('')
+    showToast('Successfully added. We will msg shortly if stock update.')
   }
 
   const spotlight = useMemo(() => {
@@ -233,9 +285,9 @@ export default function Home() {
                     </div>
                     <button
                       type="button"
-                      disabled
-                      className="rounded-full border border-orange-100 bg-white px-4 py-2 text-xs font-bold text-stone-500"
-                      title="Coming soon"
+                      onClick={() => handleNotifyClick(u)}
+                      className="rounded-full border border-orange-200 bg-white px-4 py-2 text-xs font-bold text-orange-700 transition hover:bg-orange-50"
+                      title="Notify when available"
                     >
                       Notify
                     </button>
@@ -246,6 +298,44 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {notifyOpen && (
+        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl">
+            <p className="text-lg font-bold text-stone-900">Enter your email</p>
+            <p className="mt-1 text-sm text-stone-600">
+              {notifyProduct ? `Notify for ${notifyProduct.name}` : 'Notify me'}
+            </p>
+            <input
+              type="email"
+              value={notifyEmail}
+              onChange={(e) => setNotifyEmail(e.target.value)}
+              placeholder="name@example.com"
+              className="mt-3 w-full rounded-xl border border-orange-100 px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-4 focus:ring-orange-500/10"
+            />
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setNotifyOpen(false)
+                  setNotifyProduct(null)
+                  setNotifyEmail('')
+                }}
+                className="flex-1 rounded-xl border border-orange-100 py-2.5 text-sm font-semibold text-stone-700 hover:bg-orange-50"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={submitNotifyRequest}
+                className="flex-1 rounded-xl bg-orange-500 py-2.5 text-sm font-bold text-white hover:bg-orange-600"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
       <CartDrawer

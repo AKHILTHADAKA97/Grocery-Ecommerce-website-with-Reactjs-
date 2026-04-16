@@ -8,9 +8,11 @@ import {
 import {
   addOrderToMap,
   loadOrdersMap,
+  nextOrderId,
   saveOrdersMap,
   updateOrderStatusInMap,
 } from '../utils/orderStorage'
+import { addAdminNotification } from '../utils/adminNotifications'
 
 export const ORDER_STATUSES = /** @type {const} */ ([
   'pending',
@@ -25,7 +27,7 @@ export function OrdersProvider({ children }) {
 
   const placeOrder = useCallback((payload) => {
     const order = {
-      id: `ord_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`,
+      id: nextOrderId(),
       createdAt: new Date().toISOString(),
       status: /** @type {import('../types').OrderStatus} */ ('pending'),
       ...payload,
@@ -34,6 +36,11 @@ export function OrdersProvider({ children }) {
       const next = addOrderToMap(prev, order)
       saveOrdersMap(next)
       return next
+    })
+    addAdminNotification({
+      type: 'order',
+      title: `New order ${order.id}`,
+      detail: `${order.customer?.name || 'Customer'} • ${order.payment?.method?.toUpperCase() || 'COD'} • ${order.total}`,
     })
     return order
   }, [])

@@ -2,32 +2,9 @@ import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { HelpCircle, Info, ShoppingBag, Sparkles, X } from 'lucide-react'
 
-function useOneTimeHint(key) {
-  const [show, setShow] = useState(() => {
-    try {
-      return localStorage.getItem(key) !== '1'
-    } catch {
-      return true
-    }
-  })
-
-  function close() {
-    try {
-      localStorage.setItem(key, '1')
-    } catch {
-      // ignore
-    }
-    setShow(false)
-  }
-
-  return { show, close, setShow }
-}
-
 export default function HelpFab() {
-  // “IP based” isn’t reliable in a pure frontend without a backend;
-  // we use per-device storage key (still achieves “one-time” UX).
-  const hint = useOneTimeHint('groceria_help_seen_v1')
   const [open, setOpen] = useState(false)
+  const [hovering, setHovering] = useState(false)
 
   const items = useMemo(
     () => [
@@ -46,6 +23,11 @@ export default function HelpFab() {
         title: 'Admin',
         desc: 'Admin → Calendar left, orders right. Update status dropdown.',
       },
+      {
+        icon: <Info className="h-4 w-4" />,
+        title: 'Support',
+        desc: 'Call/WhatsApp: +91 9121751697 | Email: support@groceria.shop',
+      },
     ],
     [],
   )
@@ -54,7 +36,7 @@ export default function HelpFab() {
     <>
       <div className="fixed bottom-6 right-5 z-[130] flex items-end gap-2">
         <AnimatePresence>
-          {hint.show && !open && (
+          {hovering && !open && (
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -70,14 +52,6 @@ export default function HelpFab() {
                     Click the help icon to see tips.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={hint.close}
-                  className="rounded-lg p-1 hover:bg-orange-50"
-                  aria-label="Dismiss"
-                >
-                  <X className="h-4 w-4" />
-                </button>
               </div>
             </motion.div>
           )}
@@ -86,10 +60,11 @@ export default function HelpFab() {
         <motion.button
           type="button"
           whileTap={{ scale: 0.95 }}
-          onClick={() => {
-            setOpen((v) => !v)
-            if (hint.show) hint.close()
-          }}
+          onMouseEnter={() => setHovering(true)}
+          onMouseLeave={() => setHovering(false)}
+          onFocus={() => setHovering(true)}
+          onBlur={() => setHovering(false)}
+          onClick={() => setOpen((v) => !v)}
           className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-900 text-white shadow-lg shadow-black/20 hover:bg-stone-800"
           aria-label="Help"
         >

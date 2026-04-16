@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
 import { OrdersProvider } from './context/OrdersContext'
@@ -6,11 +6,24 @@ import { WishlistProvider } from './context/WishlistContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import HelpFab from './components/HelpFab'
 import SupportWhatsAppFab from './components/SupportWhatsAppFab'
+import AdminCalendarFab from './components/AdminCalendarFab'
 import Home from './pages/Home'
 import CategoryPage from './pages/CategoryPage'
 import SearchPage from './pages/SearchPage'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
+
+function FloatingActions() {
+  const { pathname } = useLocation()
+  const isAdmin = pathname.startsWith('/admin')
+  if (isAdmin) return <AdminCalendarFab />
+  return (
+    <>
+      <HelpFab />
+      <SupportWhatsAppFab />
+    </>
+  )
+}
 
 export default function App() {
   return (
@@ -34,8 +47,7 @@ export default function App() {
                 />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
-              <HelpFab />
-              <SupportWhatsAppFab />
+              <FloatingActions />
             </CartProvider>
           </WishlistProvider>
         </OrdersProvider>
