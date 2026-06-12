@@ -12,18 +12,18 @@ jobs:
     
     defaults:
       run:
-        working-directory: ./Grocery-Ecommerce-website-with-Reactjs-/groceria-wa  # App subdirectory
+        working-directory: ./groceria-wa  # App subdirectory
         
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Setup Node.js (v18)
+    - name: Setup Node.js (v24)
       uses: actions/setup-node@v4
       with:
-        node-version: 18
+        node-version: 24
         cache: 'npm'
-        cache-dependency-path: 'Grocery-Ecommerce-website-with-Reactjs-/groceria-wa/package-lock.json'
+        cache-dependency-path: 'groceria-wa/package-lock.json'
         
     - name: Install dependencies
       run: npm ci
