@@ -261,25 +261,66 @@ export default function CheckoutModal({ open, onClose, onDone }) {
       reader.readAsDataURL(screenshot)
     }
 
+    // Emoji constants - using String.fromCodePoint for guaranteed correct encoding
+    const E = {
+      bag:   String.fromCodePoint(0x1F6CD, 0xFE0F), // 🛍️
+      person:String.fromCodePoint(0x1F464),          // 👤
+      email: String.fromCodePoint(0x1F4E7),          // 📧
+      phone: String.fromCodePoint(0x1F4DE),          // 📞
+      home:  String.fromCodePoint(0x1F3E0),          // 🏠
+      pin:   String.fromCodePoint(0x1F4CD),          // 📍
+      money: String.fromCodePoint(0x1F4B5),          // 💵
+      truck: String.fromCodePoint(0x1F69A),          // 🚚
+      card:  String.fromCodePoint(0x1F4B3),          // 💳
+      key:   String.fromCodePoint(0x1F511),          // 🔑
+      doc:   String.fromCodePoint(0x1F4C4),          // 📄
+      clock: String.fromCodePoint(0x1F552),          // 🕒
+      warn:  String.fromCodePoint(0x26A0, 0xFE0F),  // ⚠️
+      box:   String.fromCodePoint(0x1F4E6),          // 📦
+      dot:   String.fromCodePoint(0x1F538),          // 🔸
+      cash:  String.fromCodePoint(0x1F4B0),          // 💰
+      memo:  String.fromCodePoint(0x1F4DD),          // 📝
+      star:  String.fromCodePoint(0x2728),           // ✨
+      id:    String.fromCodePoint(0x1F194),          // 🆔
+      check: String.fromCodePoint(0x2705),           // ✅
+    }
+
     let linesText = ''
 
     lines.forEach((l) => {
       const amt = l.price * l.qty
-      linesText += `\u{1F538} *${l.name}* (x${l.qty}) -> ${formatMoney(amt)}\n`
+      linesText += `${E.dot} *${l.name}* (x${l.qty}) -> ${formatMoney(amt)}\n`
     })
 
     const payBlock =
       paymentMethod === 'cod'
-        ? `\u{1F4B5} *Payment Method:* COD\n\u{1F69A} *Delivery Charge:* ${formatMoney(codCharge)} (auto between Rs 30-50)`
-        : `\u{1F4B3} *Payment Method:* UPI\n\u{1F511} *UTR/Ref:* ${utr.trim()}\n\u{1F4C4} *Screenshot File:* ${screenshotName || '-'}\n\u{1F552} *Screenshot Time:* ${uploadedAt || 'Just now'}\n\n\u{26A0}\u{FE0F} *IMPORTANT:* Attach screenshot manually in WhatsApp (link sends text only).`
+        ? `${E.money} *Payment Method:* COD\n${E.truck} *Delivery Charge:* ${formatMoney(codCharge)} (auto between Rs 30-50)`
+        : `${E.card} *Payment Method:* UPI\n${E.key} *UTR/Ref:* ${utr.trim()}\n${E.doc} *Screenshot File:* ${screenshotName || '-'}\n${E.clock} *Screenshot Time:* ${uploadedAt || 'Just now'}\n\n${E.warn} *IMPORTANT:* Attach screenshot manually in WhatsApp (link sends text only).`
 
-    const msg = `\u{1F6CD}\u{FE0F} *NEW ORDER - Groceria* \u{1F6CD}\u{FE0F}\n\n\u{1F464} *Customer:* ${name.trim()}\n\u{1F4E7} *Email:* ${cleanedEmail}\n\u{1F4DE} *Phone:* ${cleanedPhone}\n\u{1F3E0} *Address:* ${address.trim()}, ${city.trim()}, ${state.trim()} - ${cleanedPin}\n\n${payBlock}\n\n\u{1F4E6} *Items:*\n${linesText}\n\u{1F4B0} *Subtotal:* ${formatMoney(subtotal)}\n\u{1F4DD} *Tax:* ${formatMoney(tax)}\n\u{2728} *TOTAL:* ${formatMoney(total)}\n\n\u{1F194} *Order ID:* ${order.id}\n\u{1F552} *Time:* ${new Date().toLocaleString()}\n\u{2705} *Please confirm.*`
-    const msgWithLandmark = msg.replace(
-      '\u{1F3E0} *Address:*',
-      `\u{1F3E0} *Address:*\n\u{1F4CD} *Landmark/Area:* ${landmark.trim()}\n`,
-    )
+    const msg = [
+      `${E.bag} *NEW ORDER - Groceria* ${E.bag}`,
+      ``,
+      `${E.person} *Customer:* ${name.trim()}`,
+      `${E.email} *Email:* ${cleanedEmail}`,
+      `${E.phone} *Phone:* ${cleanedPhone}`,
+      `${E.home} *Address:*`,
+      `${E.pin} *Landmark/Area:* ${landmark.trim()}`,
+      ` ${address.trim()}, ${city.trim()}, ${state.trim()} - ${cleanedPin}`,
+      ``,
+      payBlock,
+      ``,
+      `${E.box} *Items:*`,
+      linesText,
+      `${E.cash} *Subtotal:* ${formatMoney(subtotal)}`,
+      `${E.memo} *Tax:* ${formatMoney(tax)}`,
+      `${E.star} *TOTAL:* ${formatMoney(total)}`,
+      ``,
+      `${E.id} *Order ID:* ${order.id}`,
+      `${E.clock} *Time:* ${new Date().toLocaleString()}`,
+      `${E.check} *Please confirm.*`,
+    ].join('\n')
 
-    const url = `https://wa.me/${WA}?text=${encodeURIComponent(msgWithLandmark)}`
+    const url = `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`
     window.open(url, '_blank', 'noopener,noreferrer')
 
     clear()
