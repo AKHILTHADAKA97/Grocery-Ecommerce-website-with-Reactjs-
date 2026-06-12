@@ -265,18 +265,18 @@ export default function CheckoutModal({ open, onClose, onDone }) {
 
     lines.forEach((l) => {
       const amt = l.price * l.qty
-      linesText += `◆ ${l.name} (x${l.qty}) -> ${formatMoney(amt)}\n`
+      linesText += `🔸 *${l.name}* (x${l.qty}) -> ${formatMoney(amt)}\n`
     })
 
     const payBlock =
       paymentMethod === 'cod'
-        ? `▶ Payment Method: COD\n▶ Delivery Charge: ${formatMoney(codCharge)} (auto between Rs 30-50)`
-        : `▶ Payment Method: UPI\n▶ UTR/Ref: ${utr.trim()}\n▶ Screenshot File: ${screenshotName || '-'}\n▶ Screenshot Time: ${uploadedAt || 'Just now'}\n\n⚠ IMPORTANT: Attach screenshot manually in WhatsApp (link sends text only).`
+        ? `💵 *Payment Method:* COD\n🚚 *Delivery Charge:* ${formatMoney(codCharge)} (auto between Rs 30-50)`
+        : `💳 *Payment Method:* UPI\n🔑 *UTR/Ref:* ${utr.trim()}\n📄 *Screenshot File:* ${screenshotName || '-'}\n🕒 *Screenshot Time:* ${uploadedAt || 'Just now'}\n\n⚠️ *IMPORTANT:* Attach screenshot manually in WhatsApp (link sends text only).`
 
-    const msg = `★ NEW ORDER - Groceria ★\n\n☺ Customer: ${name.trim()}\n✉ Email: ${cleanedEmail}\n☎ Phone: ${cleanedPhone}\n⌂ Address: ${address.trim()}, ${city.trim()}, ${state.trim()} - ${cleanedPin}\n\n${payBlock}\n\n■ Items:\n${linesText}\n₹ Subtotal: ${formatMoney(subtotal)}\n✎ Tax: ${formatMoney(tax)}\n♦ TOTAL: ${formatMoney(total)}\n\n# Order ID: ${order.id}\n◷ Time: ${new Date().toLocaleString()}\n✓ Please confirm.`
+    const msg = `🛍️ *NEW ORDER - Groceria* 🛍️\n\n👤 *Customer:* ${name.trim()}\n📧 *Email:* ${cleanedEmail}\n📞 *Phone:* ${cleanedPhone}\n🏠 *Address:* ${address.trim()}, ${city.trim()}, ${state.trim()} - ${cleanedPin}\n\n${payBlock}\n\n📦 *Items:*\n${linesText}\n💰 *Subtotal:* ${formatMoney(subtotal)}\n📝 *Tax:* ${formatMoney(tax)}\n✨ *TOTAL:* ${formatMoney(total)}\n\n🆔 *Order ID:* ${order.id}\n🕒 *Time:* ${new Date().toLocaleString()}\n✅ *Please confirm.*`
     const msgWithLandmark = msg.replace(
-      '⌂ Address:',
-      `⌂ Address:\n⌁ Landmark/Area: ${landmark.trim()}\n`,
+      '🏠 *Address:*',
+      `🏠 *Address:*\n📍 *Landmark/Area:* ${landmark.trim()}\n`,
     )
 
     const url = `https://wa.me/${WA}?text=${encodeURIComponent(msgWithLandmark)}`
