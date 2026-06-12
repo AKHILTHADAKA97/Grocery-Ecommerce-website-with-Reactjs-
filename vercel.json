@@ -1,0 +1,9 @@
+{
+  "buildCommand": "cd groceria-wa && npm install && npm run build",
+  "outputDirectory": "groceria-wa/dist",
+  "installCommand": "echo skip",
+  "framework": null,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
