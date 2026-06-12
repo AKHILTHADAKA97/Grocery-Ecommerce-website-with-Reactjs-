@@ -17,7 +17,7 @@ const slides = [
   {
     title: 'Seasonal fruit, peak flavour.',
     sub: 'Hand-picked produce with transparent sourcing and chilled delivery.',
-    img: 'https://images.unsplash.com/photo-1610832958506-aa563681fecf?w=1200&q=80',
+    img: 'https://i.postimg.cc/ZRGts2Fv/c420d5cd7f846432f58906cc185e3cf2.jpg',
     cta: '/c/fruits',
   },
 ]
